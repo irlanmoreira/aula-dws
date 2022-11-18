@@ -1,0 +1,11 @@
+h1 {
+    color: blue;
+}
+
+p {
+    color: #333;
+}
+
+header, nav, footer {
+    border: 1px solid #000;
+}

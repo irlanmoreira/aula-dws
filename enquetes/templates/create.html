@@ -1,0 +1,22 @@
+{%extends 'base.html'%}
+
+{%load static%}
+
+
+{%block main%}
+<h1>Nova enquete</h1>
+
+<form action="{%url 'create'%}" method="post">
+    {%csrf_token%}
+    <label for="question_text">Enquete:</label>
+    <input type="text" name="question_text" id="question_text"
+        value="{%if form.question_text.data%}{{form.question_text.data}}{%endif%}">
+
+    {%for erro in form.question_text.errors%}
+    <p style="color: red">{{erro}}</p>
+    {%endfor%}
+    <div><button type="submit">criar</button></div>
+</form>
+
+
+{%endblock%}

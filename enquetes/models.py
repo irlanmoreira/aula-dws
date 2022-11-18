@@ -5,7 +5,7 @@ from django.db import models
 
 class Question(models.Model):
     question_text = models.CharField(
-        max_length=200, verbose_name='Título da enquete')
+        max_length=10, verbose_name='Título da enquete')
     pub_date = models.DateTimeField('Data de publicação')
 
     def __str__(self):
