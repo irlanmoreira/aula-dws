@@ -1,0 +1,16 @@
+{%extends 'base.html'%}
+
+{%block main%}
+<p><a href="{% url 'index' %}">Início</a></p>
+<h1>Enquetes</h1>
+<div>
+    <h2>{{question.question_text}}</h2>
+    <p>Data de criação: {{question.pub_date}}</p>
+    <h3>Opções:</h3>
+    {%for choice in question.choice_set.all()%}
+    {{choice}}
+    {%endfor%}
+</div>
+
+
+{%endblock%}
