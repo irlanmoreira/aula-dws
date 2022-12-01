@@ -1,7 +1,7 @@
 {%extends 'base.html'%}
 {%block main%}
 <h1>Hello world de template!!!</h1>
-<a href="{%url 'create_pull'%}">Adicionar nova enquete</a>
+
 <style>
     table,
     td,
@@ -23,7 +23,7 @@
     <tr>
         <td>{{question.question_text}}</td>
         <td>
-            <a href="{%url 'detail' question.id%}">visualizar</a>
+            <a href="{%url 'detail' question.id%}">visualizar</a> |
             <a href="{%url 'vote' question.id%}">votar</a>
         </td>
     </tr>

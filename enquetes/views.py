@@ -5,51 +5,13 @@ from django.views import generic
 import datetime
 
 from .models import Question, Choice
-from .forms import QuestionForm, QuestionModelForm, QuestionFormCustomTemplate, FormUser, ChoiceModelForm, VoteForm
-
-# as views acima serão substituídas por views genéricas
-
-
-# class IndexView (generic.ListView):
-# template_name = 'index.html'  # nome do template
-# nome do contexto que será passado para o template
-# context_object_name = 'questions'
-""" model = Question """
-
-""" def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['questions'] = Question.objects.all()
-        return context """
-
-# def get_queryset(self):
-#    return Question.objects.all()
-
-
-""" class DetailView (generic.DetailView):
-    model = Question
-    template_name = 'details.html' """
+from .forms import QuestionForm, QuestionModelForm, QuestionFormCustomTemplate, ChoiceModelForm, VoteForm
 
 
 def index(request):
     questions = Question.objects.all()
     context = {'questions': questions}
     return render(request, 'index.html', context)
-
-
-def vote(request, question_id):
-    question = get_object_or_404(Question, id=question_id)
-    form = VoteForm(question_id)
-    #form = VoteForm()
-    context = {'question': question, 'form': form}
-    if request.method == "POST":
-        form = VoteForm(question_id, request.POST)
-        #form = VoteForm(request.POST)
-        if form.is_valid():
-            choice = Choice.objects.get(pk=form.cleaned_data['choices'])
-            choice.vote()
-            choice.save()
-
-    return render(request, 'vote.html', context)
 
 
 def details(request, question_id):
@@ -82,44 +44,39 @@ def create(request):
     return render(request, 'create.html', context)
 
 
-'''
-def create(request):
+def vote(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
 
-    if request.method == "POST":  # objeto do tipo dicionário
-        # form = QuestionForm(request.POST)
-        form = QuestionModelForm(request.POST)
-        # form = QuestionFormCustomTemplate(request.POST)
-        if form.is_valid():
-            question = form.save(commit=False)
-            question.pub_date = datetime.datetime.now()
-            question.save()
+    form = VoteForm(question_id=question_id)
 
-            """ question = Question()
-            question.question_text = form.cleaned_data['question_text']
-            question.pub_date = datetime.datetime.now()
-            question.save() """
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return render(request, 'create.html', {'form': form})
-    else:
-        # form = QuestionForm()
-        # form = QuestionModelForm()
-        form = QuestionFormCustomTemplate()
-        return render(request, 'create.html', {'form': form})
-'''
-
-
-def create_user(request):
-    form = None
+    context = {'question': question, 'form': form}
     if request.method == "POST":
-        form = FormUser(request.POST)
+        form = VoteForm(request.POST, question_id=question_id)
+
         if form.is_valid():
+            choice = Choice.objects.get(pk=form.cleaned_data['choices'])
+            choice.vote()
+            return redirect('index')
+    return render(request, 'vote.html', context)
 
-            form.save()
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            form = FormUser(request.POST)
-    else:
-        form = FormUser()
+# as views acima serão substituídas por views genéricas
 
-    return render(request, 'cadastrar_usuario.html', {'form': form})
+
+# class IndexView (generic.ListView):
+# template_name = 'index.html'  # nome do template
+# nome do contexto que será passado para o template
+# context_object_name = 'questions'
+""" model = Question """
+
+""" def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['questions'] = Question.objects.all()
+        return context """
+
+# def get_queryset(self):
+#    return Question.objects.all()
+
+
+""" class DetailView (generic.DetailView):
+    model = Question
+    template_name = 'details.html' """

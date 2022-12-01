@@ -16,7 +16,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
+    choice_text = models.CharField(max_length=200, verbose_name="Opção")
     votes = models.IntegerField(default=0)
 
     def __str__(self):
@@ -24,15 +24,7 @@ class Choice(models.Model):
 
     def vote(self):
         self.votes = self.votes + 1
-
-
-class User(models.Model):
-    GENDER = (
-        ('M', 'Masculino'),
-        ('F', 'Feminino')
-    )
-    name = models.CharField("Nome", max_length=100)
-    gender = models.CharField(max_length=1, choices=GENDER)
+        self.save()
 
 
 class Address(models.Model):
