@@ -2,7 +2,31 @@
 {%block main%}
 <h1>Hello world de template!!!</h1>
 <a href="{%url 'create_pull'%}">Adicionar nova enquete</a>
-{%for question in questions%}
-<p><a href="{%url 'detail' question.id%}">{{question.question_text}}</a></p>
-{%endfor%}
+<style>
+    table,
+    td,
+    th {
+        border: 1px solid #000;
+        border-collapse: collapse;
+    }
+</style>
+<table>
+    <thead>
+
+        <th>Enquete</th>
+        <th>Ações</th>
+
+    </thead>
+
+
+    {%for question in questions%}
+    <tr>
+        <td>{{question.question_text}}</td>
+        <td>
+            <a href="{%url 'detail' question.id%}">visualizar</a>
+            <a href="{%url 'vote' question.id%}">votar</a>
+        </td>
+    </tr>
+    {%endfor%}
+</table>
 {%endblock%}

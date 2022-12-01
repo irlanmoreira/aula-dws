@@ -20,7 +20,10 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
 
     def __str__(self):
-        self.choice_text
+        return self.choice_text
+
+    def vote(self):
+        self.votes = self.votes + 1
 
 
 class User(models.Model):
@@ -30,3 +33,35 @@ class User(models.Model):
     )
     name = models.CharField("Nome", max_length=100)
     gender = models.CharField(max_length=1, choices=GENDER)
+
+
+class Address(models.Model):
+    name = models.CharField(max_length=80)
+
+    def __str__(self):
+        return self.name
+
+
+class Restaurant(models.Model):
+    address = models.OneToOneField(Address, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    serves_hot_dogs = models.BooleanField(default=False)
+    serves_pizza = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name}, {self.address.name}"
+
+
+class Publication(models.Model):
+    title = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.title
+
+
+class Article(models.Model):
+    headline = models.CharField(max_length=100)
+    publications = models.ManyToManyField(Publication)
+
+    def __str__(self):
+        return self.headline

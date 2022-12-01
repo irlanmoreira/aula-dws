@@ -1,15 +1,19 @@
 {%extends 'base.html'%}
 
 {%block main%}
+
+<h1>Enquetes - votação</h1>
 <p><a href="{% url 'index' %}">Início</a></p>
-<h1>Enquetes</h1>
 <div>
     <h2>{{question.question_text}}</h2>
     <p>Data de criação: {{question.pub_date}}</p>
     <h3>Opções:</h3>
-    {%for choice in question.choice_set.all()%}
-    {{choice}}
-    {%endfor%}
+    <ul>
+        {%for choice in question.choice_set.all%}
+        <li><strong>{{choice}}</strong>: {{choice.votes}}</li>
+        {%endfor%}
+    </ul>
+
 </div>
 
 

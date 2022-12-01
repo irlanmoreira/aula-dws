@@ -1,5 +1,5 @@
 from django import forms
-from .models import Question, User
+from .models import Question, User, Choice
 
 
 def mobile_num(value):
@@ -13,10 +13,25 @@ class QuestionForm(forms.Form):
         label="Enquete", max_length=5)
 
 
+class FormUser(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = '__all__'
+        widgets = {
+            'gender': forms.RadioSelect(choices=User.GENDER)}
+
+
 class QuestionModelForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['question_text']
+
+
+class ChoiceModelForm(forms.ModelForm):
+    class Meta:
+        model = Choice
+        fields = ['choice_text']
 
 
 class QuestionFormCustomTemplate(forms.Form):
@@ -25,10 +40,18 @@ class QuestionFormCustomTemplate(forms.Form):
     template_name = 'forms/form_question.html'
 
 
-class FormUser(forms.ModelForm):
+class VoteForm(forms.Form):
 
-    class Meta:
-        model = User
-        fields = '__all__'
-        widgets = {
-            'gender': forms.RadioSelect(choices=User.GENDER)}
+    choices = forms.ChoiceField(
+        widget=forms.RadioSelect(), label="Opções")
+
+    def __init__(self, question_id=None, *args, **kwargs):
+
+        super(VoteForm, self).__init__(*args, **kwargs)
+        if not question_id == None:
+
+            self.question_id = question_id
+            question = Question.objects.get(pk=self.question_id)
+            choices = question.choice_set.all()
+            self.fields['choices'].choices = (
+                [(c.id, c.choice_text) for c in choices])
