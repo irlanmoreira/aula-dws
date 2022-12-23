@@ -1,14 +1,52 @@
 {%extends 'base.html'%}
 
-{%load static%}
-{%block styles%}
-<link rel="stylesheet" href="{%static 'enquetes/css/style.css'%}">
+{%block navbar%}
+{%include 'navs/navmain.html'%}
 {%endblock%}
 
 {%block main%}
-<h1>Hello world, Template!</h1>
-<a href="{%url 'create'%}">Criar nova enquete</a>
-{% for question in questions %}
-<p><a href="{% url 'details' question.id %}">{{question}}</a></p>
-{% endfor %}
+
+<style>
+    table,
+    td,
+    th {
+        border: 1px solid #000;
+        border-collapse: collapse;
+    }
+</style>
+
+<h1>Hello world de template!!!</h1>
+{%if user.is_authenticated%}
+{%if messages%}
+{%for message in messages%}
+{{message}}
+{%endfor%}
+{%endif%}
+Hi, {{user.first_name}}
+<p><a href="{%url 'logout'%}">Log out</a></p>
+{%else%}
+<p>You are not logged in</p>
+<a href="{%url 'login'%}">Log In</a> |
+<a href="{%url 'signup'%}">Sig Up</a>
+{%endif%}
+
+<table>
+    <thead>
+
+        <th>Enquete</th>
+        <th>Ações</th>
+
+    </thead>
+
+
+    {%for question in questions%}
+    <tr>
+        <td>{{question.question_text}}</td>
+        <td>
+            <a href="{%url 'detail' question.id%}">visualizar</a> |
+            <a href="{%url 'vote' question.id%}">votar</a>
+        </td>
+    </tr>
+    {%endfor%}
+</table>
 {%endblock%}

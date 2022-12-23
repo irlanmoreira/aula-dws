@@ -1,22 +1,25 @@
 {%extends 'base.html'%}
-
-{%load static%}
-
-
 {%block main%}
-<h1>Nova enquete</h1>
+{{user.username}}
+<h1>Criar nova enquete</h1>
 
-<form action="{%url 'create'%}" method="post">
+<form action="{% url 'create_pull' %}" method="post">
     {%csrf_token%}
-    <label for="question_text">Enquete:</label>
-    <input type="text" name="question_text" id="question_text"
-        value="{%if form.question_text.data%}{{form.question_text.data}}{%endif%}">
 
-    {%for erro in form.question_text.errors%}
-    <p style="color: red">{{erro}}</p>
-    {%endfor%}
-    <div><button type="submit">criar</button></div>
+    <div>
+        {{form_question.question_text.label_tag}}
+        {{form_question.question_text}}
+        {{form_choice1.choice_text.label_tag}}
+        {{form_choice1.choice_text}}
+        {{form_choice2.choice_text.label_tag}}
+        {{form_choice2.choice_text}}
+
+        {%for error in form.question_text.errors%}
+        <span style="color:red">{{error}}</span>
+        {%endfor%}
+    </div>
+
+    <button type="submit">Criar</button>
 </form>
-
-
 {%endblock%}
+<!---->

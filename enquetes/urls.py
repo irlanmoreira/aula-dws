@@ -2,7 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<int:question_id>', views.details, name='details'),
-    path('create', views.create, name='create'),
+    path('', views.IndexView.as_view(), name='index'),
+    path('<int:pk>', views.DetailsQuestionView.as_view(), name='detail'),
+    path('create', views.create, name="create_pull"),
+    path('vote/<int:question_id>', views.vote, name="vote"),
 ]

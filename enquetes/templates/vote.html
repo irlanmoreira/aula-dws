@@ -1,0 +1,19 @@
+{%extends 'base.html'%}
+
+{%block main%}
+
+<h1>Enquetes - votação</h1>
+<p><a href="{% url 'index' %}">Início</a></p>
+<div>
+    <h2>{{question.question_text}}</h2>
+
+    <form action="{%url 'vote' question.id%}" method="post">
+
+        {%csrf_token%}
+        {{form}}
+        <button type="submit">Votar</button>
+    </form>
+</div>
+
+
+{%endblock%}
