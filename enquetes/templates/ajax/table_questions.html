@@ -1,0 +1,11 @@
+<tbody>
+    {%for question in questions%}
+    <tr>
+        <td>{{question.question_text}}</td>
+        <td>
+            <a href="{%url 'detail' question.id%}">visualizar</a> |
+            <a href="{%url 'vote' question.id%}">votar</a>
+        </td>
+    </tr>
+    {%endfor%}
+</tbody>

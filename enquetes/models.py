@@ -1,17 +1,22 @@
-from email.policy import default
-from django.db import models
 
+from django.db import models
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 
 
 class Question(models.Model):
     question_text = models.CharField("Enquete", max_length=100)
+    Author = models.ForeignKey(
+        get_user_model(), verbose_name="Autor", on_delete=models.CASCADE, null=True)
     pub_date = models.DateTimeField(
         'Data de publicação', auto_now_add=True)
 
     def __str__(self):
         return self.question_text
+
+    class Meta:
+        ordering = ['-pub_date']
 
 
 class Choice(models.Model):
@@ -25,35 +30,3 @@ class Choice(models.Model):
     def vote(self):
         self.votes = self.votes + 1
         self.save()
-
-
-class Address(models.Model):
-    name = models.CharField(max_length=80)
-
-    def __str__(self):
-        return self.name
-
-
-class Restaurant(models.Model):
-    address = models.OneToOneField(Address, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
-    serves_hot_dogs = models.BooleanField(default=False)
-    serves_pizza = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.name}, {self.address.name}"
-
-
-class Publication(models.Model):
-    title = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.title
-
-
-class Article(models.Model):
-    headline = models.CharField(max_length=100)
-    publications = models.ManyToManyField(Publication)
-
-    def __str__(self):
-        return self.headline

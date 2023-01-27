@@ -1,17 +1,60 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-from django.views import generic
-import datetime
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import Group
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.core import serializers
 
 from .models import Question, Choice
-from .forms import QuestionForm, QuestionModelForm, QuestionFormCustomTemplate, ChoiceModelForm, VoteForm
+from .forms import QuestionModelForm, ChoiceModelForm, VoteForm
 
 
+@login_required(login_url='/user/login')
 def index(request):
     questions = Question.objects.all()
-    context = {'questions': questions}
+
+    paginator = Paginator(questions, 2)
+    page_number = request.GET.get('p')
+    page_obj = paginator.get_page(page_number)
+    context = {'questions': questions, 'page_obj': page_obj}
+
     return render(request, 'index.html', context)
+
+
+def search(request, text):
+
+    result = Question.objects.filter(question_text__contains=text)
+
+    return render(request, 'ajax/table_questions.html', {'questions': result})
+
+
+class IndexView (LoginRequiredMixin, ListView):
+    template_name = "index.html"
+    model = Question
+    context_object_name = "questions"
+    login_url = '/user/login'
+    page_kwarg = 'pagina'
+    paginate_by = 2
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.user.groups.filter(name="Criador").exists():
+
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponse("Este usuário não possui permissão para acessar esta página")
+
+
+class DetailsQuestionView (LoginRequiredMixin, DetailView):
+    template_name = "details.html"
+    model = Question
+    login_url = '/user/login'
+
+    def get_object(self):
+        self.question = get_object_or_404(Question, pk=self.kwargs['pk'])
+        return self.question
 
 
 def details(request, question_id):
@@ -20,25 +63,36 @@ def details(request, question_id):
     return render(request, 'details.html', context)
 
 
+class CreateQuestionView(LoginRequiredMixin, CreateView):
+    login_url = '/user/login'
+    model = Question
+    form_class = ""
+
+
+@login_required(login_url='/user/login')
 def create(request):
     form_question = QuestionModelForm()
     form_choice1 = ChoiceModelForm(prefix='choice1')
     form_choice2 = ChoiceModelForm(prefix='choice2')
-    question = Question.objects.get(pk=1)
-    print(question.choice_set.all())
+    question = None
+
     if request.method == 'POST':
         form_question = QuestionModelForm(request.POST)
         form_choice1 = ChoiceModelForm(request.POST, prefix='choice1')
         form_choice2 = ChoiceModelForm(request.POST, prefix='choice2')
+    questions = Question.objects.filter(id=1)
+    if all([form_question.is_valid(), form_choice1.is_valid(), form_choice2.is_valid()]):
+        autor = request.user
 
-        if all([form_question.is_valid(), form_choice1.is_valid(), form_choice2.is_valid()]):
-            question = form_question.save()
-            choice1 = form_choice1.save(commit=False)
-            choice2 = form_choice2.save(commit=False)
-            choice1.question = choice2.question = question
-            choice1.save()
-            choice2.save()
-            return redirect('index')
+        question = form_question.save(commit=False)
+        question.Author = autor
+        question.save()
+        choice1 = form_choice1.save(commit=False)
+        choice2 = form_choice2.save(commit=False)
+        choice1.question = choice2.question = question
+        choice1.save()
+        choice2.save()
+        return redirect('index')
     context = {'form_question': form_question,
                'form_choice1': form_choice1, 'form_choice2': form_choice2}
     return render(request, 'create.html', context)
@@ -58,25 +112,3 @@ def vote(request, question_id):
             choice.vote()
             return redirect('index')
     return render(request, 'vote.html', context)
-
-# as views acima serão substituídas por views genéricas
-
-
-# class IndexView (generic.ListView):
-# template_name = 'index.html'  # nome do template
-# nome do contexto que será passado para o template
-# context_object_name = 'questions'
-""" model = Question """
-
-""" def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['questions'] = Question.objects.all()
-        return context """
-
-# def get_queryset(self):
-#    return Question.objects.all()
-
-
-""" class DetailView (generic.DetailView):
-    model = Question
-    template_name = 'details.html' """

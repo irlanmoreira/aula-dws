@@ -1,4 +1,8 @@
 {% load static %}
+{% load bootstrap5 %}
+
+{%bootstrap_css%}
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -8,20 +12,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'css/style.css'%}">
-    <title>Document</title>
+    <title>{%block title%}{%endblock%}</title>
 </head>
 
 <body>
     <header></header>
-    <nav>
-        <ul>
-            <li><a href="{%url 'index'%}">Home</a></li>
-            <li><a href="{%url 'create_pull'%}">Cadastrar enquete</a></li>
-        </ul>
-    </nav>
+    {%block navbar%}
+    {%endblock%}
     {%block main%}
     {%endblock%}
 
+    {%bootstrap_javascript%}
 </body>
 
 </html>

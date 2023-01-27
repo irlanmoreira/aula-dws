@@ -1,6 +1,11 @@
 {%extends 'base.html'%}
+
+
+{%block navbar%}
+{%include 'navs/navmain.html'%}
+{%endblock%}
+
 {%block main%}
-<h1>Hello world de template!!!</h1>
 
 <style>
     table,
@@ -10,6 +15,21 @@
         border-collapse: collapse;
     }
 </style>
+
+<h1>Hello world de template!!!</h1>
+{%if user.is_authenticated%}
+
+Hi, {{user.first_name}}
+{%if user.image%}
+<img src="{{user.image.url}}" alt="{{user.username}}" width="50px" height="50px" style="border-radius: 100%;">
+{%endif%}
+<p><a href="{%url 'logout'%}">Log out</a></p>
+{%else%}
+<p>You are not logged in</p>
+<a href="{%url 'login'%}">Log In</a> |
+<a href="{%url 'signup'%}">Sig Up</a>
+{%endif%}
+
 <table>
     <thead>
 
@@ -18,15 +38,53 @@
 
     </thead>
 
-
-    {%for question in questions%}
-    <tr>
-        <td>{{question.question_text}}</td>
-        <td>
-            <a href="{%url 'detail' question.id%}">visualizar</a> |
-            <a href="{%url 'vote' question.id%}">votar</a>
-        </td>
-    </tr>
-    {%endfor%}
+    <input type="search" name="search" id="search" placeholder="Pesquisar...">
+    <tbody>
+        {%for question in questions%}
+        <tr>
+            <td>{{question.question_text}}</td>
+            <td>
+                <a href="{%url 'detail' question.id%}">visualizar</a> |
+                <a href="{%url 'vote' question.id%}">votar</a>
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
 </table>
+<div>
+    <span>
+        {%if page_obj.has_previous%}
+        <a href="?pagina=1">&laquo; primeira</a>
+        <a href="?pagina={{ page_obj.previous_page_number }}">anterior</a>
+        {%endif%}
+        <span>
+            Página {{page_obj.number}} de {{page_obj.paginator.num_pages}},
+        </span>
+        {%if page_obj.has_next%}
+        <a href="?pagina={{ page_obj.next_page_number }}">próxima</a>
+        <a href="?pagina={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+        {%endif%}
+    </span>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <script>
+        $(() => {
+            const search = $("#search")
+            const tbody = $("tbody").html()
+
+            $("#search").keyup(() => {
+                let text = search.val()
+                if (text.length === 0) {
+                    $("tbody").replaceWith("<tbody>" + tbody + "</tbody>")
+                } else {
+                    $.get(`/search/${text}`, (data) => {
+                        $("tbody").replaceWith(data)
+                    })
+                }
+            })
+        })
+
+    </script>
+
+</div>
 {%endblock%}
